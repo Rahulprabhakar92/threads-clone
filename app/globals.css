@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer components {
-
   /* main */
   .main-container {
     @apply flex min-h-screen flex-1 flex-col items-center bg-dark-1 px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
@@ -159,19 +158,4 @@
 
 .comment-form_btn {
   @apply rounded-3xl bg-primary-500 px-8 py-2 !text-small-regular text-light-1 max-xs:w-full !important;
-}
-.logout-container {
-    position: relative;
-    cursor: pointer; /* Add this if you want to indicate that it's clickable */
-}
-
-.logout-container:hover::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5); /* Change the background color and opacity as per your preference */
-    z-index: 1;
 }
