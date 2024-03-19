@@ -61,12 +61,13 @@ interface Props{
 
           if(!file.type.includes('image')) return;
 
+          filereader.readAsDataURL(file)
           filereader.onload=async(event)=>{
             const imageDataurl=event.target?.result?.toString() || " "
 
             fieldchange(imageDataurl)
           }
-          filereader.readAsDataURL(file)
+          
         }
     }
     const onSubmit=async (values: z.infer<typeof userValidation>)=> {
