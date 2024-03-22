@@ -19,6 +19,9 @@ import { ChangeEvent, useState } from "react"
 import { Textarea } from "../ui/textarea"
 import { isBase64Image } from "@/lib/utils"
 import { useUploadThing } from "@/lib/uploadthing"
+import { userUpdate } from "@/lib/actions/user.actions"
+import { usePathname } from "next/navigation"
+import Router, { useRouter } from "next/router"
 
 interface Props{
     user:{
@@ -37,6 +40,10 @@ interface Props{
   const[files,setfiles]=useState<File[]>([])
 
   const { startUpload  }= useUploadThing("media")
+
+  const pathname=usePathname()
+  const route=useRouter()
+
 
     const form =useForm({
         resolver:zodResolver(userValidation),
@@ -67,7 +74,6 @@ interface Props{
 
             fieldchange(imageDataurl)
           }
-          
         }
     }
     const onSubmit=async (values: z.infer<typeof userValidation>)=> {
@@ -83,7 +89,14 @@ interface Props{
             values.profile_photo = imgRes[0].url
           }
         } 
-        //todo create a backend  
+        await userUpdate({
+          userid:user.id,
+          username:values.username,
+          name:values.name,
+          bio:values.bio,
+          image:values.profile_photo,
+          path:pathname
+        })
       }
 
     return(

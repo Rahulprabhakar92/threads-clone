@@ -1,19 +1,19 @@
 import mongoose from 'mongoose'
 
-let isconnected=true;
+let IsConnected=false;
 
 export const connectToDB=async()=>{
-    mongoose.set('strictQuery',true);
+    mongoose.set('strictQuery',true)
 
-    if(!process.env.MONGODB_URL) return console.log('the key not exisrt')
-    if(isconnected) return console.log("mongodb connected")
+    if(!process.env.MONGODB_URL) return console.log('the mongo url does not exist')
+
+    if(IsConnected) return console.log('connected to mongodb')
 
     try{
-        await mongoose.connect(process.env.MONGODB_URL);
+        await mongoose.connect(process.env.MONGODB_URL)
+        IsConnected=true
 
-        isconnected=true
     }catch(error){
-        console.log(error)
-
+        console.log(`the error is ${error}`)
     }
 }
