@@ -21,7 +21,7 @@ import { isBase64Image } from "@/lib/utils"
 import { useUploadThing } from "@/lib/uploadthing"
 import { userUpdate } from "@/lib/actions/user.actions"
 import { usePathname } from "next/navigation"
-import Router, { useRouter } from "next/router"
+import  { useRouter } from "next/navigation"
 
 interface Props{
     user:{
@@ -42,7 +42,7 @@ interface Props{
   const { startUpload  }= useUploadThing("media")
 
   const pathname=usePathname()
-  const route=useRouter()
+  const router=useRouter()
 
 
     const form =useForm({
@@ -63,18 +63,28 @@ interface Props{
 
         if(e.target.files && e.target.files.length>0){
           const file=e.target.files[0]
+          console.log("Selected File:", file); // Log the selected file for verification
+
 
           setfiles(Array.from(e.target.files))
 
-          if(!file.type.includes('image')) return;
+          if (!file.type.includes('image')) {
+            console.log("File is not an image."); // Log if the selected file is not an image
+            return;
+        }
+
+         
+        filereader.onload = async (event) => {
+          const imageDataUrl = event.target?.result?.toString() || " ";
+
+          console.log("Image Data URL:", imageDataUrl); // Log the extracted image data URL
+
+          fieldchange(imageDataUrl);
+      };
 
           filereader.readAsDataURL(file)
-          filereader.onload=async(event)=>{
-            const imageDataurl=event.target?.result?.toString() || " "
-
-            fieldchange(imageDataurl)
-          }
         }
+        
     }
     const onSubmit=async (values: z.infer<typeof userValidation>)=> {
         const blob=values.profile_photo;
@@ -90,13 +100,20 @@ interface Props{
           }
         } 
         await userUpdate({
-          userid:user.id,
+          userId:user.id,
           username:values.username,
           name:values.name,
           bio:values.bio,
           image:values.profile_photo,
           path:pathname
         })
+        
+        if(pathname === "/profile/edit"){
+          router.back()
+        }
+        else{
+          router.push('/')
+        }
       }
 
     return(
@@ -127,7 +144,7 @@ interface Props{
             height={24}/>
             )}
               </FormLabel>
-              
+
               <FormControl className="flex-1 text-base-semibold text-gray-500 ">
                 <Input 
                 type='file'
@@ -136,6 +153,7 @@ interface Props{
                 className="account-form_image-input "
                 onChange={(e)=>{handleimage(e,field.onChange)}}/>
               </FormControl>
+              <FormMessage/>
              
 
             </FormItem>
@@ -155,6 +173,7 @@ interface Props{
                 {...field}
                 className="account-form_input "/>
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -169,10 +188,10 @@ interface Props{
               <FormControl >
                 <Input 
                 type='input'
-
                 {...field}
                 className="account-form_input "/>
               </FormControl>
+              <FormMessage/>
              
 
             </FormItem>
@@ -192,6 +211,7 @@ interface Props{
                 {...field}
                 className="account-form_input no-focus "/>
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
