@@ -23,7 +23,7 @@ export async function createThread({ text, author, communityid, path }: Params
         });
         // Update User model
         await User.findByIdAndUpdate(author, {
-          $push: { threads: createdThread._id },
+          $push: { Threads: createdThread._id },
         });
         revalidatePath(path);
       } catch (error: any) {
@@ -88,5 +88,42 @@ export async function fetchThreadByid(id:string) {
   }catch(error:any){
      throw new Error (`Error fetching thread ${error.message}`)
   }
+  
+}
+
+export async function addcommenttoThread(
+  ThreadId:string,
+  commentText:string,
+  userid:string,
+  path:string
+
+  ) {
+    try{
+      connectToDB()
+
+      //to find the original thread
+     const originalThread=await Thread.findById(ThreadId)
+      if(!originalThread) {
+         throw new Error("Thread not found")}
+    //create a new thread with comment text 
+    const commentThread=new Thread({
+      text:commentText,
+      author:userid,
+      parentid:ThreadId,
+    })
+    //we save the commentthread
+    const savedComment= await commentThread.save()
+
+    //we update push the commentthread into the children of the parentid (the post we wanna comment in)
+    originalThread.children.push(savedComment._id)
+
+    await originalThread.save()
+
+    revalidatePath(path)
+
+
+    }catch(error:any){
+      throw new Error(`Error in the comment therad ${error.message}`)
+    }
   
 }

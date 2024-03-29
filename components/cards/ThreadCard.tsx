@@ -22,11 +22,11 @@ interface props{
             image:string
         }
     }[],
-    Iscomment?:boolean;
+    IsComment?:boolean;
 
 }
 const ThreadCard=({
-    id,
+    id, 
     currentuserid,
     parentid,
     content,
@@ -34,12 +34,15 @@ const ThreadCard=({
     Community,
     createdAt,
     comments,
-    Iscomment,
+    IsComment
 
 }:props)=>{
     return(
         <>
-        <article className="w-full p-10 rounded-xl bg-dark-2 flex-col flex">
+         <article
+      className={`flex w-full flex-col rounded-xl ${
+        IsComment ? "px-0 xs:px-7" : "bg-dark-2 p-7"
+      }`}>
             <div className="flex items-start justify-between ">
                 <div className="flex w-full flex-1 flex-row gap-4 ">
 
@@ -89,7 +92,7 @@ const ThreadCard=({
                             height={24}
                             className="curser-pointer object-contain"/>
                         </div>
-                        {Iscomment && comments.length>0 && (
+                        {IsComment && comments.length>0 && (
                             <Link href={`/thread/${id}`}>
                                 <p className="mt-1 text-subtle-medium text-gray-1">
                                     {comments.length} replies</p>

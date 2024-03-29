@@ -1,8 +1,10 @@
 import ThreadCard from "@/components/cards/ThreadCard";
+import Comment from "@/components/forms/Comment";
 import { fetchThreadByid } from "@/lib/actions/Thread.action";
 import { fetchuser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
+
 
 const Page=async({params}:{params:{id:string}})=>{
     if(!params.id) return null;
@@ -31,7 +33,29 @@ const Page=async({params}:{params:{id:string}})=>{
          comments={post.children}
          />
         </div>
-
+        <div className="mt-7 ">
+            <Comment 
+            threadId={post.id}
+            currentUserimg={userinfo.image}
+            userid={userinfo._id}/>
+        </div>
+        //to display
+        <div className="mt-10">
+            {post.children.map((childrenitem:any)=>(            
+            <ThreadCard
+                key={childrenitem._id}
+                id={childrenitem._id}
+                currentuserid={childrenitem?.id || " "}
+                parentid={childrenitem.parentid}
+                content={childrenitem.text}
+                author={childrenitem.author}
+                Community={childrenitem.community}
+                createdAt={childrenitem.createdAt}
+                comments={childrenitem.children}
+                IsComment
+                />
+            ))}
+        </div>
     </section>)
 }
 export default Page;
