@@ -1,4 +1,5 @@
 'use server'
+import Thread from "../models/Thread.model";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose"
 import { revalidatePath } from "next/cache";
@@ -53,4 +54,30 @@ export async function fetchuser(userId: string) {
     throw new Error(`this is the new error: ${error.message}`)
 
    }   
+}
+
+export async function fetchUserposts(userId:string) {
+    try{
+        connectToDB()
+        const allthreads= await User.findOne({ id:userId })
+        .populate({
+            path:'Threads',
+            model:Thread,
+            populate:{
+                path:'children',
+                model:Thread,
+                populate:{
+                    path:'author',
+                    model:User,
+                    select:"name image id"
+                }
+
+            }
+            
+        })
+        return allthreads
+
+    }catch(error:any){
+        throw new Error(`the error is ${error.message}`)
+    }
 }

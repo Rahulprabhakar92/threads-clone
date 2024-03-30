@@ -12,51 +12,63 @@ interface Params{
     path:string
 }
 export async function createThread({ text, author, communityid, path }: Params
-    ) {
-
-      try {
-        connectToDB();
-        const createdThread = await Thread.create({
-          text,
-          author,
-          community: null, // Assign communityId if provided, or leave it null for personal account
-        });
-        // Update User model
-        await User.findByIdAndUpdate(author, {
-          $push: { Threads: createdThread._id },
-        });
-        revalidatePath(path);
-      } catch (error: any) {
-        throw new Error(`Failed to create thread: ${error.message}`);
-      }
+  ) {
+    try {
+      connectToDB();
+  
+    
+  
+      const createdThread = await Thread.create({
+        text,
+        author,
+        community: null, // Assign communityId if provided, or leave it null for personal account
+      });
+  
+      // Update User model
+      await User.findByIdAndUpdate(author, {
+        $push: { threads: createdThread._id },
+      });
+  
+      revalidatePath(path);
+    } catch (error: any) {
+      throw new Error(`Failed to create thread: ${error.message}`);
     }
-export async function fetchPosts(pageNumber=1,pageSize=20){
-  connectToDB()
-  //to caluclate the number of post to skip on bsics of page nuimber 
-  const skipnumber=(pageNumber - 1)*pageSize
-   //todo the uiry
-  const postsQurey=Thread.find ( { parentid : { $in: [null,undefined] }})
-  .sort({createdAt:'desc'})
-  .skip(skipnumber)
-  .limit(pageSize)
-  .populate({path:"author",model:User})
-  .populate({path:'children',
-   populate:{
-    path:"author",
-    model:User,
-    select:"_id name parentId image"
   }
-})
+    export async function fetchPosts(pageNumber = 1, pageSize = 20) {
+      connectToDB();
+    
 
-const totalpostcount=await Thread.countDocuments({ parentid : { $in: [null,undefined] }})
-const posts = await postsQurey.exec()
-const isNext=totalpostcount>skipnumber+posts.length;
-return{ posts,isNext }
+      const skipAmount = (pageNumber - 1) * pageSize;
+    
 
+      const postsQuery = Thread.find({ parentId: { $in: [null, undefined] } })
+        .sort({ createdAt: "desc" })
+        .skip(skipAmount)
+        .limit(pageSize)
+        .populate({
+          path: "author",
+          model: User,
+        })
+        .populate({
+          path: "children", 
+          populate: {
+            path: "author", 
+            model: User,
+            select: "_id name parentId image", 
+          },
+        });
+    
+    
+      const totalPostsCount = await Thread.countDocuments({
+        parentId: { $in: [null, undefined] },
+      }); 
+      console.log(totalPostsCount+"this is the fetchpost action")
+    
+      const posts = await postsQuery.exec();
 
-
-}
-
+      const isNext = totalPostsCount > skipAmount + posts.length;
+      return { posts, isNext };
+    }
 export async function fetchThreadByid(id:string) {
   connectToDB()
   try{
@@ -91,39 +103,42 @@ export async function fetchThreadByid(id:string) {
   
 }
 
-export async function addcommenttoThread(
-  ThreadId:string,
-  commentText:string,
-  userid:string,
-  path:string
+export async function addCommentToThread(
+  threadId: string,
+  commentText: string,
+  userId: string,
+  path: string
+) {
+  connectToDB();
 
-  ) {
-    try{
-      connectToDB()
+  try {
+    // Find the original thread by its ID
+    const originalThread = await Thread.findById(threadId);
 
-      //to find the original thread
-     const originalThread=await Thread.findById(ThreadId)
-      if(!originalThread) {
-         throw new Error("Thread not found")}
-    //create a new thread with comment text 
-    const commentThread=new Thread({
-      text:commentText,
-      author:userid,
-      parentid:ThreadId,
-    })
-    //we save the commentthread
-    const savedComment= await commentThread.save()
-
-    //we update push the commentthread into the children of the parentid (the post we wanna comment in)
-    originalThread.children.push(savedComment._id)
-
-    await originalThread.save()
-
-    revalidatePath(path)
-
-
-    }catch(error:any){
-      throw new Error(`Error in the comment therad ${error.message}`)
+    if (!originalThread) {
+      throw new Error("Thread not found");
     }
+
+    // Create the new comment thread
+    const commentThread = new Thread({
+      text: commentText,
+      author: userId,
+      parentId: threadId, 
+    });
+
+
+    const savedCommentThread = await commentThread.save();
+
+
+    originalThread.children.push(savedCommentThread._id);
+
+
+    await originalThread.save();
+
+    revalidatePath(path);
+  } catch (err) {
+    console.error("Error while adding comment:", err);
+    throw new Error("Unable to add comment");
+  }
   
 }

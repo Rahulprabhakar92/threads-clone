@@ -6,6 +6,7 @@ import ProfileHeader from "@/components/shared/ProfileHeader";
 import { TabsList,TabsContent,Tabs,TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
 import { profileTabs } from "@/constants";
+import Threadstab from "@/components/shared/Threadstab";
 
 async function Page({params}:{params:{id: string}}) {
     const user =await currentUser()
@@ -14,7 +15,6 @@ async function Page({params}:{params:{id: string}}) {
 
     const userinfo= await fetchuser(params.id)
     if(!userinfo?.onboarded) redirect("/onboarding")
-    console.log(userinfo)
 
     return(
 
@@ -50,6 +50,16 @@ async function Page({params}:{params:{id: string}}) {
                            </TabsTrigger>
                         ))}
                     </TabsList>
+                    {profileTabs.map((tab)=>(
+                        <TabsContent key={`tab.label`} value={tab.value}
+                        className="w-full text-light-1">
+                            <Threadstab
+                            currentuserId={user.id}
+                            accountId={userinfo.id}
+                            accountType="User"
+                            />
+                        </TabsContent>
+                    ))}
                     
                 </Tabs>
             </div>
