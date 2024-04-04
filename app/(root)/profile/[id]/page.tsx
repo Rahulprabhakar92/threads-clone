@@ -51,7 +51,7 @@ async function Page({params}:{params:{id: string}}) {
                         ))}
                     </TabsList>
                     {profileTabs.map((tab)=>(
-                        <TabsContent key={`tab.label`} value={tab.value}
+                        <TabsContent key={`content-${tab.label}`} value={tab.value}
                         className="w-full text-light-1">
                             <Threadstab
                             currentuserId={user.id}

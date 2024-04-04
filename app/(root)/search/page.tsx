@@ -1,8 +1,47 @@
+import {  fetchusers,fetchuser } from "@/lib/actions/user.actions";
+import { currentUser } from "@clerk/nextjs"
+import { redirect } from "next/navigation"
+import Usercard from "@/components/cards/Usercard";
 const page = async() => {
+  
+    const user =await currentUser()
+    if(!user) return null;
+
+    const userinfo= await fetchuser(user.id)
+    if(!userinfo?.onboarded) redirect("/onboarding")
+
+    const result=await fetchusers({
+      userId:user.id,
+      searchString:'',
+      pagenumber:1,
+      pagesize:25,
+    })
+
   return (
-    <section className="head-text text-light-1">
-        Search
-    </section>
+    <article>
+
+      <h1 className="head-text mb-10"> Search</h1>
+
+      <div className="mt-14 flex flex-col gap-9">
+      {result.users.length === 0 ?(
+        <p className="no-result">no users</p>
+      ):(
+        <>
+        {result.users.map((person)=>(
+          <Usercard
+          key={person.id}
+          id={person.id}
+          name={person.name}
+          username={person.name}
+          imgUrl={person.image}
+          personType='User'
+          />
+        ))}
+        </>
+      )}
+      </div>
+    
+    </article>
   )
 }
 

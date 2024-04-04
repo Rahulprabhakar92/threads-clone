@@ -1,8 +1,11 @@
 'use server'
+import { getJsPageSizeInKb } from "next/dist/build/utils";
 import Thread from "../models/Thread.model";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose"
 import { revalidatePath } from "next/cache";
+import { FilterQuery, SortOrder } from "mongoose";
+import { ADDRGETNETWORKPARAMS } from "dns";
 
 interface params{
     userId:string,
@@ -80,4 +83,79 @@ export async function fetchUserposts(userId:string) {
     }catch(error:any){
         throw new Error(`the error is ${error.message}`)
     }
+}
+
+export async function fetchusers({
+     userId,
+     searchString="",
+     pagenumber=1,
+     sortby='desc',
+     pagesize=20
+
+} : {
+    userId:string,
+    searchString:string, 
+    pagenumber:number,
+    sortby?:SortOrder,
+    pagesize:number
+}) {
+    try{
+        const skipamount = (pagenumber - 1 ) * pagesize
+        const regex= new RegExp(searchString,"i")
+
+        const query:FilterQuery<typeof User>={
+            id:{$ne:userId}
+        }
+
+        if(searchString.trim() !== ''){
+            query.$or=[
+                {username:{$regex:regex}},
+                {name:{$regex:regex}}
+            ]
+        }
+        const sortOptions={ createdAt:sortby};
+        const userQuery=User.find(query)
+        .sort(sortOptions)
+        .skip(skipamount)
+        .limit(pagesize)
+
+        const totalusercount = await User.countDocuments(query)
+
+        const users=await userQuery.exec()
+
+        const isNext=totalusercount> skipamount+users.length
+
+        return {users,isNext}
+
+    }catch(error:any){
+        throw new Error(`the error is of coz of :${error.message}`)
+    }
+    
+}
+
+export async function getActivity(userid:{
+    userid:string
+}) {
+    try{
+        connectToDB()
+        //find all threads
+        const userThreads=await Thread.find({author:userid})
+        //collect all the children id
+        const childrenThreadIds=userThreads.reduce((acc,userThreads)=>{
+            return acc.concat(userThreads.children)
+        },[])
+        const replies=await Thread.find({
+            _id:{$in:childrenThreadIds},
+            author:{$ne:userid}
+        }).populate({
+            path:"author",
+            model:User,
+            select:"name image _id"
+        })
+
+        return replies;
+    }catch(error:any){
+        throw new Error (`the Eroor form activity ${error.message}`)
+    }
+    
 }
