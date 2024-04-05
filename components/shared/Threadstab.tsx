@@ -1,36 +1,79 @@
-import { fetchUserposts } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
+
+
+import { fetchUserposts } from "@/lib/actions/user.actions";
+
 import ThreadCard from "../cards/ThreadCard";
 
-interface props{
-    currentuserId:string,
-    accountId:string,
-    accountType:string
+interface Result {
+  name: string;
+  image: string;
+  id: string;
+  Threads: {
+    _id: string;
+    text: string;
+    parentId: string | null;
+    author: {
+      name: string;
+      image: string;
+      id: string;
+    };
+    community: {
+      id: string;
+      name: string;
+      image: string;
+    } | null;
+    createdAt: string;
+    children: {
+      author: {
+        image: string;
+      };
+    }[];
+  }[];
 }
-const Threadstab= async( {currentuserId,accountId,accountType}:props)=>{
-    let result =await fetchUserposts(accountId)
-    if(!result) redirect("/")
-    return(
-        <section className="mt-9 flex flex-col gap-10">
-            {result.Threads.map((Thread:any)=>(
-                <ThreadCard
-                key={Thread._id}
-                id={Thread._id}
-                currentuserid={currentuserId}
-                parentid={Thread.parentid}
-                content={Thread.text}
-                author={
-                    accountType === 'User'
-                    ?{name:result.name,image:result.image,id:result.id}:
-                    {name:Thread.author.name,image:Thread.author.image,id:Thread.author.id}
-                }//update
-                Community={Thread.community}
-                createdAt={Thread.createdAt}
-                comments={Thread.children}
-                />
-            ))}
 
-        </section>
-    )
+interface Props {
+  currentUserId: string;
+  accountId: string;
+  accountType: string;
 }
-export default Threadstab;
+
+async function ThreadsTab({ currentUserId, accountId, accountType }: Props) {
+  let result: Result;
+
+
+    result = await fetchUserposts(accountId);
+  
+
+  if (!result) {
+    redirect("/");
+  }
+
+  return (
+    <section className='mt-9 flex flex-col gap-10'>
+      {result.Threads.map((thread) => (
+        <ThreadCard
+          key={thread._id}
+          id={thread._id}
+          currentuserid={ currentUserId}
+          parentid={thread.parentId}
+          content={thread.text}
+          author={
+            accountType === "User"
+              ? { name: result.name, image: result.image, id: result.id }
+              : {
+                  name: thread.author.name,
+                  image: thread.author.image,
+                  id: thread.author.id,
+                }
+          }
+          Community={thread.community}
+          createdAt={thread.createdAt}
+          comments={thread.children}
+        />
+      ))}
+    </section>
+  );
+}
+
+export default ThreadsTab;
