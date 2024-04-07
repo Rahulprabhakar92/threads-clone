@@ -8,7 +8,7 @@ export default async function Home() {
   const result = await fetchPosts(1,30);
   
   const user=await currentUser()
-  
+
   
   return (
     <>
@@ -21,6 +21,7 @@ export default async function Home() {
           <>
         {result.posts.map((post)=>{
           return (
+            
             <ThreadCard
             key={post._id}
             id={post._id}

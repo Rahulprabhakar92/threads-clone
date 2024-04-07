@@ -1,5 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Organization } from "@clerk/nextjs/server";
+import { formatDateString } from "@/lib/utils";
+import { create } from "domain";
 
 interface props{
     id:string,
@@ -100,9 +103,27 @@ const ThreadCard=({
                         )}
                     </div>
                     </div>
-
                 </div>
+
+               
             </div>
+
+            {!IsComment && Community && (
+                    <Link href={`/communities/${Community.id}`}
+                    className="mt-5 flex items-center">
+                        <p className="text-subtle-medium text-gray-1">
+                            {formatDateString(createdAt)}
+                          {" "}  -{Community.name} Community
+                        </p>
+                        <Image
+                        src={Community.image}
+                        alt={Community.name}
+                        width={14}
+                        height={14}
+                        className="ml-1 rounded-full object-cover"
+                        />
+                    </Link>
+                )}
             
         </article>
         
