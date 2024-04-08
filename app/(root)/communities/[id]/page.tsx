@@ -10,6 +10,7 @@ import ThreadsTab from "@/components/shared/Threadstab";
 import { fetchCommunityDetails } from "@/lib/actions/community.actions";
 import Usercard from "@/components/cards/Usercard";
 
+
 async function Page({ params }: { params: { id: string } }) {
   const user = await currentUser();
   if (!user) return null;
@@ -19,6 +20,7 @@ async function Page({ params }: { params: { id: string } }) {
 
   return (
     <section>
+      
       <ProfileHeader
         accountId={communitydetails.id}
         authUserid={user.id}
@@ -26,7 +28,7 @@ async function Page({ params }: { params: { id: string } }) {
         username={communitydetails.username}
         imgUrl={communitydetails.image}
         bio={communitydetails.bio}
-        type="Community"
+        type="communities"
       />
 
       <div className='mt-9'>

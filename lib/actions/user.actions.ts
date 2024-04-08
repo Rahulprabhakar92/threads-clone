@@ -100,7 +100,7 @@ export async function fetchUsers({
   searchString = "",
   pageNumber = 1,
   pageSize = 20,
-  sortBy = "ascending",
+  sortBy = "desc",
 }: {
   userId: string;
   searchString?: string;

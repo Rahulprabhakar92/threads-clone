@@ -124,10 +124,30 @@ const ThreadCard=({
                         />
                     </Link>
                 )}
-            
-        </article>
-        
-        </>
+              <>
+              {comments.length > 0 && (
+               <div className="flex items-center mt-2 right-0 relative">
+                   {comments.map((member, index) => (
+                <Image
+                key={index}
+                src={member.author.image}
+                alt="member_image"
+                width={28}
+                height={28}
+                className={`${
+                    index !== 0 && "-ml-2"
+                } rounded-full object-cover`}
+            />
+        ))}
+        <p className=" ml-2 text-subtle-medium text-gray-1 ">replies</p>
+        {comments.length > 0 && (
+            <p className="ml-1 text-gray-1 text-subtle-medium">
+                {comments.length}+Users
+            </p>
+        )}
+    </div>
+)}</>          
+        </article>  </>
     )
 
 

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import Communitycard from "@/components/cards/Usercard";
 import { fetchCommunities } from "@/lib/actions/community.actions";
 import CommunityCard from "@/components/cards/Communitycard";
+import Search from "@/components/shared/Search";
 const page = async() => {
   
     const user =await currentUser()
@@ -21,6 +22,12 @@ const page = async() => {
   return (
    <section>
     <h1 className="head-text mb-10"> Search</h1>
+
+    <div>
+        <Search
+        routerType="communities" 
+        />
+      </div>
 
     <div className="mt-14 flex flex-col gap-9">
       {result.communities.length === 0 ? (
