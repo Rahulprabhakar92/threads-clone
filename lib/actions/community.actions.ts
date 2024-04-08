@@ -107,7 +107,7 @@ export async function fetchCommunities({
   searchString = "",
   pageNumber = 1,
   pageSize = 20,
-  sortBy = "desc",
+  sortBy = "asc",
 }: {
   searchString?: string;
   pageNumber?: number;

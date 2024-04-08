@@ -19,7 +19,7 @@ import { ChangeEvent, useState } from "react"
 import { Textarea } from "../ui/textarea"
 import { isBase64Image } from "@/lib/utils"
 import { useUploadThing } from "@/lib/uploadthing"
-import { userUpdate } from "@/lib/actions/user.actions"
+import { updateUser } from "@/lib/actions/user.actions"
 import { usePathname } from "next/navigation"
 import  { useRouter } from "next/navigation"
 
@@ -99,7 +99,7 @@ interface Props{
             values.profile_photo = imgRes[0].url
           }
         } 
-        await userUpdate({
+        await updateUser({
           userId:user.id,
           username:values.username,
           name:values.name,

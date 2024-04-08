@@ -1,18 +1,23 @@
 import AccountProfile from "@/components/forms/AccountProfile";
 import { currentUser } from "@clerk/nextjs";
+import { fetchUser } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 
 async function Page() {
     const user= await currentUser();
+    if(!user) return null;
 
-    const userinfo={}
+    const userinfo=await fetchUser(user.id)
+
+    if(userinfo?.onboarded) redirect('/')
 
     const userdata={
         id:user?.id ,
         objectId:userinfo?._id,
-        username:user?.username || userinfo?.username,
-        name:userinfo?.firstname || user?.name || "",
-        bio:userinfo?.bio||"",
-        image:userinfo?.image||user?.imageUrl
+        username:userinfo ? userinfo?.username :user?.username,
+        name:userinfo ? userinfo?.name :user?.firstName,
+        bio:userinfo ? userinfo?.bio : "",
+        image:userinfo ? userinfo?.image :user?.imageUrl,
 
 
 

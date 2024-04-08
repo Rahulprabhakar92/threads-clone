@@ -3,11 +3,10 @@ import { communityTabs } from "@/constants";
 import { currentUser } from "@clerk/nextjs";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import ThreadsTab from "@/components/shared/Threadstab";
 
 
-import { fetchUser } from "@/lib/actions/user.actions";
+
 import { fetchCommunityDetails } from "@/lib/actions/community.actions";
 import Usercard from "@/components/cards/Usercard";
 
@@ -22,7 +21,7 @@ async function Page({ params }: { params: { id: string } }) {
     <section>
       <ProfileHeader
         accountId={communitydetails.id}
-        authUserid={communitydetails.id}
+        authUserid={user.id}
         name={communitydetails.name}
         username={communitydetails.username}
         imgUrl={communitydetails.image}
@@ -55,7 +54,7 @@ async function Page({ params }: { params: { id: string } }) {
 
 
         <TabsContent
-          value={"threads"}
+          value="threads"
           className='w-full text-light-1'
         >
           <ThreadsTab
@@ -63,15 +62,14 @@ async function Page({ params }: { params: { id: string } }) {
            accountId={communitydetails._id}
            accountType="Community"
           />
-
         </TabsContent>
 
         <TabsContent
-          value={"members"}
+          value="members"
           className='w-full text-light-1'
         >
         <section className="mt-9 flex flex-col gap-10">
-            {communitydetails?.members.map((memeber:any)=>{
+            {communitydetails?.members.map((memeber:any)=>(
                 <Usercard
                 key={memeber.id}
                 id={memeber.id}
@@ -80,7 +78,7 @@ async function Page({ params }: { params: { id: string } }) {
                 username={memeber.username}
                 personType="User"
                 />
-            })}
+            ))}
         </section>
 
         </TabsContent>
