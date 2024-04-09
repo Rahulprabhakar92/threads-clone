@@ -1,15 +1,19 @@
 
 import ThreadCard from "@/components/cards/ThreadCard"
+import Like from "@/components/shared/Like";
 import { fetchPosts } from "@/lib/actions/Thread.action"
+import { fetchUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs"
+import { redirect } from "next/navigation";
 
 export default async function Home() {
 
   const result = await fetchPosts(1,30);
   
   const user=await currentUser()
+  if(!user ) return null;
 
-  
+
   return (
     <>
     <h1 className="head-text text-left">Home</h1>
@@ -25,6 +29,7 @@ export default async function Home() {
             <ThreadCard
             key={post._id}
             id={post._id}
+           
             currentuserid={user?.id || " "}
             parentid={post.parentid}
             content={post.text}
@@ -32,10 +37,12 @@ export default async function Home() {
             Community={post.community}
             createdAt={post.createdAt}
             comments={post.children}
-            />)
-            
+            />
+            )
             
           })}
+
+
         </>
       )}
 

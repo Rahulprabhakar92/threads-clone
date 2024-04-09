@@ -7,6 +7,7 @@ import { connectToDB } from "../mongoose";
 import User from "../models/user.model";
 import Thread from "../models/Thread.model";
 import Community from "../models/community.model";
+import { removeUserFromCommunity } from "./community.actions";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   connectToDB();
@@ -239,3 +240,46 @@ export async function addCommentToThread(
   }
 }
 
+
+export async function addLikeToThread(threadId: string, userId: string, delta: number) {
+  try {
+    await connectToDB();
+
+    // Find the thread and increment the liked field by delta
+    const thread = await Thread.findByIdAndUpdate(
+      threadId,
+      { $inc: { liked: delta } },
+      { new: true }
+    ).exec();
+
+    if (!thread) {
+      throw new Error(`Thread with ID ${threadId} not found`);
+    }
+
+    await thread.save();
+
+    
+    // Update the user's likedThreads array with the thread ID
+    await User.updateOne(
+      { _id: userId },
+      { $push: { likedThreads: threadId } }
+    ).exec();
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false };
+  }
+}
+export async function gettotallikesforpost(postid:string) {
+  try{
+    connectToDB()
+
+    const totalLikes = await Thread.findById(postid).select('liked');
+
+    return totalLikes.liked.length;
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
+}

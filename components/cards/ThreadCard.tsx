@@ -1,11 +1,14 @@
+
 import Link from "next/link";
 import Image from "next/image";
 import { Organization } from "@clerk/nextjs/server";
 import { formatDateString } from "@/lib/utils";
-import { create } from "domain";
+import Like from "../shared/Like";
+
 
 interface props{
     id:string,
+   
     currentuserid:string ,
     parentid:string | null,
     content:string,
@@ -37,9 +40,13 @@ const ThreadCard=({
     Community,
     createdAt,
     comments,
-    IsComment
+    IsComment,
+
 
 }:props)=>{
+
+
+
     return(
         <>
          <article
@@ -72,11 +79,9 @@ const ThreadCard=({
                     </p>
                     <div className={`${IsComment && 'mb-10' } mt-5 flex flex-col gap-3 `}>
                         <div className="flex gap-3.5">
-                            <Image src="/assets/heart-gray.svg"
-                            alt="heart"
-                            width={24}
-                            height={24}
-                            className="curser-pointer object-contain"/>
+
+                        <Like  currentuserid={currentuserid}   postid={id}/>
+                            
                             <Link href={`/thread/${id}`}>
                             <Image src="/assets/reply.svg"
                             alt="reply"

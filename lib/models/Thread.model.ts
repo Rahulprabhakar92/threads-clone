@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const threadSchema = new mongoose.Schema({
   text: {
     type: String,
@@ -27,6 +28,7 @@ const threadSchema = new mongoose.Schema({
       ref: "Thread",
     },
   ],
+  
 });
 
 const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
